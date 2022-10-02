@@ -1,0 +1,43 @@
+<div class="myContent">
+  <div class="container">
+    <!--Add angular form logic here-->
+    <form #updateDoctorForm="ngForm" (ngSubmit)="editDoctorDetails(doctorname.value)">
+      <h2 style="text-align:center">Update Doctor</h2>
+      <h6 style="text-align:center;color:dimgrey;font-size:small">All fields are mandatory</h6>
+      <table align="center">
+        <tr>
+          <th align="justify"> <label>Doctor Id</label> </th>
+          <th>
+            <input type="text" id="doctorID" name="doctorId" #docId="ngModel" [ngModel]="doctorId"  class="form-control qkinput" readonly>
+          </th>
+        </tr>
+        <tr></tr>
+        <tr></tr>
+        <tr></tr>
+        <tr>
+          <th align="justify"> <label>Doctor Name</label> </th>
+          <th>
+            <!--Add angular form logic here-->
+            <input type="text" id="docname" class="form-control qkinput" name="doctorname" #doctorname="ngModel" [ngModel]="doctorName" required>
+            <!--Add your validation logic here-->
+            <div id="add_validate_doctorName" class="text-danger-validation" *ngIf="doctorname.errors && (doctorname.dirty || doctorname.value)">
+              <div [hidden]="!doctorname.errors.required"><p>Doctor Name is required</p></div>
+            </div>
+          </th>
+        </tr>
+        <tr></tr>
+        <tr></tr>
+        <tr></tr>
+        <tr>
+          <th></th>
+          <th>
+            <div class="form-group" style="text-align:left">
+              <button type="submit" [disabled]="!updateDoctorForm.form.valid" class="btn">Update</button> &nbsp;&nbsp;
+              <a routerLink="/viewDoctors">Cancel</a>
+            </div>
+          </th>
+        </tr>
+      </table>
+    </form>
+  </div>
+</div>

@@ -1,0 +1,30 @@
+<div class="row title">
+  <h2 align="center">Add a new Doctor</h2>
+</div>
+<!--Add angular form logic here-->
+<form align="center" #addDoctorForm="ngForm" (ngSubmit)="addDoctor(docname.value)">
+  <table align="center">
+    <tr>
+      <th align="justify"> <label>Doctor Name</label> </th>
+      <th>
+        <!--Add angular form logic here-->
+        <input type="text" id="add_doctorName" class="form-control cwinput" name="doctorName" #docname="ngModel" [ngModel]="doctorName" required>
+
+         <div id="add_validate_doctorName" class="text-danger-validation" *ngIf="docname.errors && (docname.dirty || docname.value)">
+            <!--Add validation logic here-->
+           <div [hidden]="!docname.errors.required"><p>Doctor Name is required</p></div>
+          </div>
+      </th>
+    </tr>
+    <tr>
+      <th></th>
+      <th align="justify">
+        <button class="btn" type="submit" [disabled]="!addDoctorForm.form.valid"(click)="addDoctor(docname)">Add Doctor</button>&nbsp;&nbsp;
+        <a routerLink="/class" routerLinkActive="active">Cancel</a>
+      </th>
+
+  </table>
+  <div *ngIf="showDiv" style="color:red;text-align:center;">
+    {{msg}}
+  </div>
+</form>
