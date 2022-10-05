@@ -100,7 +100,7 @@ GO
 
 CREATE TABLE Categories
 (
-	[CategoryId] TINYINT CONSTRAINT pk_CategoryId PRIMARY KEY IDENTITY,
+	[CategoryId] VARCHAR(3) CONSTRAINT pk_CategoryId PRIMARY KEY,
 	[CategoryName] VARCHAR(20) CONSTRAINT uq_CategoryName UNIQUE NOT NULL 
 )
 GO
@@ -109,17 +109,19 @@ CREATE TABLE Packages
 (
 	[PackageId] CHAR(4) CONSTRAINT pk_PackageId PRIMARY KEY CONSTRAINT chk_PackageId CHECK(PackageId LIKE 'P%'),
 	[PackageName] VARCHAR(50) CONSTRAINT uq_PackageName UNIQUE NOT NULL,
-	[CategoryId] TINYINT CONSTRAINT fk_CategoryId REFERENCES Categories(CategoryId),
+	[CategoryId] VARCHAR(3) CONSTRAINT fk_CategoryId REFERENCES Categories(CategoryId),
 	[Price] NUMERIC(8) CONSTRAINT chk_Price CHECK(Price>0) NOT NULL,
 	[Types]  VARCHAR(15) NOT NULL,
 	[Description] VARCHAR(200) NOT NULL,
 	[Paths] VARCHAR(MAX) ,
+	[PlacesToVisit] VARCHAR(50) NOT NULL,
+	[DayNight] VARCHAR(4) NOT NULL,
+	[Accomodation] BIT NOT NULL
 )
 GO
 
 
 CREATE INDEX ix_RoleId ON Users(RoleId)
-CREATE INDEX ix_CategoryId ON Packages(CategoryId)
 GO
 
 
@@ -168,16 +170,16 @@ AS
 GO
 
 
-CREATE FUNCTION ufn_GetPackageDetailsCategoryId(@CategoryId INT)
+CREATE FUNCTION ufn_GetPackageDetailsCategoryId(@CategoryId varchar)
 RETURNS TABLE 
 AS
-RETURN (SELECT PackageId,PackageName,Price,Types,Description,Paths FROM Packages WHERE CategoryId=@CategoryId)
+RETURN (SELECT PackageId,PackageName,Price,Types,Description,Paths,PlacesToVisit,DayNight,Accomodation FROM Packages WHERE CategoryId=@CategoryId)
 GO
 
 CREATE FUNCTION ufn_GetPackageDetailsByType(@Types VARCHAR)
 RETURNS TABLE 
 AS
-RETURN (SELECT PackageId,PackageName,Price,Types,Description FROM Packages WHERE Types=@Types)
+RETURN (SELECT PackageId,PackageName,Price,Types,Description,Paths,PlacesToVisit,DayNight,Accomodation FROM Packages WHERE Types=@Types)
 GO
 
 CREATE FUNCTION ufn_GenerateNewPackageId()
@@ -197,25 +199,6 @@ BEGIN
 	
 END
 GO
-
-CREATE FUNCTION ufn_GenerateNewCategoryId()
-RETURNS INT
-AS
-BEGIN
-
-	DECLARE @CategoryId INT
-	
-	IF NOT EXISTS(SELECT PackageId FROM Packages)
-		SET @CategoryId ='1'
-		
-	ELSE
-		SELECT @CategoryId =MAX(CategoryId)+1 FROM Categories
-
-	RETURN @CategoryId 
-	
-END
-GO
-
 
 CREATE PROCEDURE usp_RegisterUser
 (
@@ -281,19 +264,16 @@ SET IDENTITY_INSERT Roles OFF
 
 
 -- insertion script for Categories
-SET IDENTITY_INSERT Categories ON
-INSERT INTO Categories (CategoryId, CategoryName) VALUES (1, 'Adventure')
-INSERT INTO Categories (CategoryId, CategoryName) VALUES (2, 'Nature')
-INSERT INTO Categories (CategoryId, CategoryName) VALUES (3, 'Religious')
-INSERT INTO Categories (CategoryId, CategoryName) VALUES (4, 'Village')
-INSERT INTO Categories (CategoryId, CategoryName) VALUES (5, 'Wildlife')
-SET IDENTITY_INSERT Categories OFF
-
+INSERT INTO Categories (CategoryId, CategoryName) VALUES ('ADV', 'Adventure')
+INSERT INTO Categories (CategoryId, CategoryName) VALUES ('NAT', 'Nature')
+INSERT INTO Categories (CategoryId, CategoryName) VALUES ('REG', 'Religious')
+INSERT INTO Categories (CategoryId, CategoryName) VALUES ('VIL', 'Village')
+INSERT INTO Categories (CategoryId, CategoryName) VALUES ('WLD', 'Wildlife')
 GO
 
 -- insertion script for Users
-INSERT INTO Users( EmailId,FirstName,LastName,ContactNumber,UserPassword,RoleId,Gender, DateOfBirth,Address) VALUES('Franken@gmail.com','Frank','Job','1234567890','ABCDE@1234',2,'F','1976-08-26','Fauntleroy Circus')
+INSERT INTO Users( EmailId,FirstName,LastName,ContactNumber,UserPassword,RoleId,Gender, DateOfBirth,Address) VALUES('Franken@gmail.com','Frank','Job','1234567890','ABCDE@1234',2,'M','1976-08-26','Fauntleroy Circus')
 GO
 
 -- insertion script for Packages
-INSERT INTO Packages(PackageId,PackageName,CategoryId,Price,Types,Description,Paths) VALUES('P101','Andaman and Nicobar',1,18000000.00,'IND','A set of island in the Bay of Bengal','')
+INSERT INTO Packages(PackageId,PackageName,CategoryId,Price,Types,Description,Paths,PlacesToVisit,DayNight,Accomodation) VALUES('P101','Andaman and Nicobar','ADV',18000000.00,'IND','','A set of island in the Bay of Bengal','Sundarban,Kolkata,Howrah','7/8',1)
